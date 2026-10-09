@@ -1,0 +1,55 @@
+CREATE DATABASE classicmodels;
+USE classicmodels;
+
+CREATE TABLE customers (
+    customerNumber INT PRIMARY KEY,
+    customerName VARCHAR(50) NOT NULL,
+    contactLastName VARCHAR(50),
+    contactFirstName VARCHAR(50),
+    phone VARCHAR(50),
+    addressLine1 VARCHAR(50),
+    city VARCHAR(50),
+    country VARCHAR(50)
+);
+USE classicmodels;
+
+-- Truy vấn 1: Tìm khách hàng theo tên
+EXPLAIN SELECT * FROM customers WHERE customerName = 'Land of Toys Inc.';
+
+-- Chạy thực tế (đo thời gian)
+SELECT * FROM customers WHERE customerName = 'Land of Toys Inc.';
+-- Tạo Index đơn
+ALTER TABLE customers 
+ADD INDEX idx_customerName(customerName);
+
+-- Chạy lại EXPLAIN
+EXPLAIN SELECT * FROM customers WHERE customerName = 'Land of Toys Inc.';
+-- Tạo Index kết hợp cho 2 cột
+ALTER TABLE customers 
+ADD INDEX idx_full_name(contactFirstName, contactLastName);
+
+-- Chạy EXPLAIN
+EXPLAIN SELECT * FROM customers 
+WHERE contactFirstName = 'Jean' OR contactFirstName = 'King';
+-- Xóa Index đơn
+ALTER TABLE customers DROP INDEX idx_customerName;
+
+-- Xóa Index kết hợp
+ALTER TABLE customers DROP INDEX idx_full_name;
+
+-- Kiểm tra danh sách Index còn lại
+SHOW INDEX FROM customers;
+-- Bật profiling
+SET profiling = 1;
+
+-- Chạy truy vấn KHÔNG có Index
+SELECT * FROM customers WHERE customerName = 'Land of Toys Inc.';
+
+-- Tạo Index
+ALTER TABLE customers ADD INDEX idx_customerName(customerName);
+
+-- Chạy truy vấn CÓ Index
+SELECT * FROM customers WHERE customerName = 'Land of Toys Inc.';
+
+-- Xem thời gian thực thi
+SHOW PROFILES;
